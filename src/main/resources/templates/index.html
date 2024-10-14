@@ -27,35 +27,14 @@
 
     <div id="navbarBasicExample" class="navbar-menu">
         <div class="navbar-start">
-            <a class="navbar-item">
-                Home
+            <a class="navbar-item" href="/">
+                Tarefas
             </a>
 
-            <a class="navbar-item">
-                Documentation
+            <a class="navbar-item" href="/users">
+                Ranking
             </a>
 
-            <div class="navbar-item has-dropdown is-hoverable">
-                <a class="navbar-link">
-                    More
-                </a>
-
-                <div class="navbar-dropdown">
-                    <a class="navbar-item">
-                        About
-                    </a>
-                    <a class="navbar-item is-selected">
-                        Jobs
-                    </a>
-                    <a class="navbar-item">
-                        Contact
-                    </a>
-                    <hr class="navbar-divider">
-                    <a class="navbar-item">
-                        Report an issue
-                    </a>
-                </div>
-            </div>
         </div>
 
         <div class="navbar-end">
@@ -64,7 +43,7 @@
                     <figure class="image">
                         <img class="is-rounded" th:src="${avatar}" alt="avatar do usuário" />
                     </figure>
-                    <span th:text="${user.attributes.name}"></span>
+                    <span th:text="${user.name}"></span>
                     <a href="/logout" class="button is-light">
                         Log out
                     </a>
@@ -89,12 +68,33 @@
     <div class="card cell  has-background-grey-dark" th:each="task: ${tasks}">
         <header class="card-header has-background-primary">
             <p class="card-header-title" th:text="${task.title}"></p>
+            <figure class="image" th:if="${task.user}">
+                <img th:src="${task.user.avatar}" alt="avatar do usuario atribudi" class="is-rounded" style="height: 50px"/>
+            </figure>
             <span class="tag is-warning" th:text="${task.score} + pts"></span>
         </header>
 
         <div class="card-content">
             <div class="content" th:text="${task.description}"></div>
-            <progress class="progress is-primary" th:value="${task.status}" max="100" th:text="${task.score} + '%'"></progress>
+            <div class="is-flex is-align-items-center">
+                <form th:action="@{/task/dec/{id}(id=${task.id})}" method="post" th:if="${task.status>0}">
+                    <input type="hidden" name="_method" value="put">
+                    <button class="button is-primary is-outlined">
+                    <span class="icon is-small">
+                      <i class="fas fa-minus"></i>
+                    </span>
+                    </button>
+                </form>
+                <progress class="progress is-primary" th:value="${task.status}" max="100" th:text="${task.score} + '%'"></progress>
+                <form th:action="@{/task/inc/{id}(id=${task.id})}" method="post" th:if="${task.status<100}">
+                    <input type="hidden" name="_method" value="put">
+                    <button class="button is-primary is-outlined">
+                    <span class="icon is-small">
+                      <i class="fas fa-plus"></i>
+                    </span>
+                    </button>
+                </form>
+            </div>
         </div>
 
         <footer class="card-footer">
@@ -105,6 +105,26 @@
                       <i class="fas fa-trash"></i>
                     </span>
                     <span>apagar</span>
+                </button>
+            </form>
+
+            <form th:action="@{/task/catch/{id}(id=${task.id})}" method="post" th:if="${task.user == null}">
+                <input type="hidden" name="_method" value="put">
+                <button class="button is-primary is-outlined">
+                    <span class="icon is-small">
+                      <i class="fas fa-hand"></i>
+                    </span>
+                    <span>pegar</span>
+                </button>
+            </form>
+
+            <form th:action="@{/task/release/{id}(id=${task.id})}" method="post">
+                <input type="hidden" name="_method" value="put">
+                <button class="button is-primary is-outlined">
+                    <span class="icon is-small">
+                      <i class="fas fa-hand"></i>
+                    </span>
+                    <span>largar</span>
                 </button>
             </form>
         </footer>
